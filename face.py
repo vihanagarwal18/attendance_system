@@ -1,20 +1,18 @@
-# # # import cv2
-# # # video=cv2.VideoCapture(0)  ## 0 for internal webcam, 1 for external webcam
-
-# # # while(True):
-# # #     ret,frame=video.read() #this give 2 value one is boolean value to check whether webcam is okay or not and second is frame
-# # #     cv2.imshow('frame',frame)
-# # #     k=cv2.waitKey(1) 
-# # #     if k==ord('q'):  #ord is used to convert character to integer and as soon we press q it will close camera
-# # #         break
-# # # video.release()
-# # # cv2.destroyAllWindows()
+# import cv2
+# video=cv2.VideoCapture(0)  ## 0 for internal webcam, 1 for external webcam
+# while(True):
+#     ret,frame=video.read() #this give 2 value one is boolean value to check whether webcam is okay or not and second is frame
+#     cv2.imshow('frame',frame)
+#     k=cv2.waitKey(1) 
+#     if k==ord('q'):  #ord is used to convert character to integer and as soon we press q it will close camera
+#         break
+# video.release()
+# cv2.destroyAllWindows()
 
 import face_recognition
 import numpy as np
 from PIL import Image, ImageDraw
 from IPython.display import display
-#from google.colab.patches import cv2_imshow
 import cv2
 from datetime import datetime
 import csv
@@ -99,16 +97,46 @@ def register_new_person(image_file, name):
     print(f"{name} is already registered.")
 
 def makeAttendanceEntry(name):
+    now = datetime.now()
+    dtString = now.strftime('%d/%b/%Y, %H:%M:%S')
+    
     with open('attendance_list.csv', 'r+') as FILE:
         allLines = FILE.readlines()
-        attendanceList = []
+        updatedLines = []
+        found = False
         for line in allLines:
             entry = line.split(',')
-            attendanceList.append(entry[0])
-        if name not in attendanceList:
-            now = datetime.now()
-            dtString = now.strftime('%d/%b/%Y, %H:%M:%S')
-            FILE.writelines(f'\n{name},{dtString}')
+            if entry[0] == name:
+                found = True
+                updatedLines.append(f'{name},{dtString}\n')
+            else:
+                updatedLines.append(line)
+        
+        # If the name was not found, add a new entry
+        if not found:
+            updatedLines.append(f'{name},{dtString}\n')
+        
+        FILE.seek(0)
+        FILE.truncate()
+        FILE.writelines(updatedLines)
+
+def delete_person_from_known_faces():
+    global known_face_encodings, known_face_names
+    name_to_delete = input("Enter the name of the person to delete: ")
+    index_to_delete = None
+    for i, name in enumerate(known_face_names):
+        if name == name_to_delete:
+            index_to_delete = i
+            break
+    if index_to_delete is not None:
+        known_face_encodings.pop(index_to_delete)
+        known_face_names.pop(index_to_delete)
+        print(f"{name_to_delete} has been deleted from known_faces.csv.")
+        # Save the updated data to the CSV file
+        save_known_faces()
+    else:
+        print(f"{name_to_delete} not found in known_faces.csv.")
+        
 
 def open_camera_and_mark_attendance():
     video = cv2.VideoCapture(0)
@@ -133,32 +161,3 @@ def open_camera_and_mark_attendance():
     video.release()
     cv2.destroyAllWindows()
     
-load_known_faces()
-#open_camera_and_register()
-open_camera_and_mark_attendance()
-save_known_faces()
-           
-# file_name = "testing_images/unknown_el.jpg"
-# unknown_image = face_recognition.load_image_file(file_name)
-# unknown_image_to_draw = cv2.imread(file_name)
-# face_locations = face_recognition.face_locations(unknown_image)
-# face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
-# pil_image = Image.fromarray(unknown_image)
-# draw = ImageDraw.Draw(pil_image)
-# for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-#     # See if the face is a match for the known face(s)
-#     matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-#     name = "Unknown"
-#     face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-#     best_match_index = np.argmin(face_distances)
-#     if matches[best_match_index]:
-#         name = known_face_names[best_match_index]
-#     # Draw a box around the face using the Pillow module
-#     cv2.rectangle(unknown_image_to_draw,(left, top), (right, bottom), (0,255,0),3 )
-#     draw.rectangle(((left, top), (right, bottom)), outline=(0, 255, 255))
-#     cv2.putText(unknown_image_to_draw,name,(left,top-20), cv2.FONT_HERSHEY_SIMPLEX,1, (0,0,255), 2,cv2.LINE_AA)
-#     print(name)
-#     makeAttendanceEntry(name)
-
-# # display(pil_image)
-# cv2.imshow(unknown_image_to_draw)
