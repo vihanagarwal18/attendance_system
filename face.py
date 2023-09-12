@@ -9,6 +9,8 @@
 # video.release()
 # cv2.destroyAllWindows()
 
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import face_recognition
 import numpy as np
 from PIL import Image, ImageDraw
@@ -17,6 +19,9 @@ import cv2
 from datetime import datetime
 import csv
 import os
+
+app=Flask(__name__)
+CORS(app)
 
 known_face_encodings = []
 known_face_names = []
@@ -38,7 +43,6 @@ known_face_names.append("Donald Trump")
 known_face_encodings.append(face_3_encoding)
 known_face_names.append("Jeff Bezos")
 
-
 def load_known_faces():
     global known_face_encodings, known_face_names
     try:
@@ -52,6 +56,7 @@ def load_known_faces():
     except FileNotFoundError:
         known_face_encodings = []
         known_face_names = []
+        
 
 def save_known_faces():
     with open('known_faces.csv', 'w', newline='') as file:
@@ -160,4 +165,57 @@ def open_camera_and_mark_attendance():
             break
     video.release()
     cv2.destroyAllWindows()
+    
+    
+@app.route('/register', methods=['POST'])
+def register_person():
+    try:
+        name = request.form.get('name')
+        image_data = request.files['image']
+        
+        if not name or not image_data:
+            return jsonify({'error': 'Name and image are required.'}), 400
+
+        image_file = f"{name}.jpg"
+        image_data.save(image_file)
+        register_new_person(image_file, name)
+        return jsonify({'message': f'Registered {name}.'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/mark-attendance', methods=['POST'])
+def mark_attendance():
+    try:
+        open_camera_and_mark_attendance()
+        # image_data = request.files['image']
+        # if not image_data:
+        #     return jsonify({'error': 'Image is required.'}), 400
+
+        # image = face_recognition.load_image_file(image_data)
+        # face_locations = face_recognition.face_locations(image)
+        # face_encodings = face_recognition.face_encodings(image, face_locations)
+        
+        # for face_encoding in face_encodings:
+        #     matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+        #     name = "Unknown"
+        #     if True in matches:
+        #         first_match_index = matches.index(True)
+        #         name = known_face_names[first_match_index]
+        #         makeAttendanceEntry(name)
+        
+        return jsonify({'message': 'Attendance marked successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/register-student', methods=['POST'])
+def register_student():
+    try:
+        open_camera_and_register()
+        return jsonify({'message': 'Student registered successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
     
