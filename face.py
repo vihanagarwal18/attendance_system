@@ -65,8 +65,8 @@ def save_known_faces():
             encoding_str = np.array2string(encoding, separator=', ')
             csv_writer.writerow([name, encoding_str])
 
-def open_camera_and_register():
-    name = input("Enter the name of the new person: ")
+def open_camera_and_register(name):
+    #name = input("Enter the name of the new person: ")
     video = cv2.VideoCapture(0)
     while True:
         ret, frame = video.read()
@@ -127,13 +127,10 @@ def makeAttendanceEntry(name):
 
 def delete_person_from_known_faces():
     global known_face_encodings, known_face_names
-    name_to_delete = input("Enter the name of the person to delete: ")
-    index_to_delete = None
-    for i, name in enumerate(known_face_names):
-        if name == name_to_delete:
-            index_to_delete = i
-            break
-    if index_to_delete is not None:
+    name_to_delete = input("Enter the name of the person to delete: ").strip()
+    
+    if name_to_delete in known_face_names:
+        index_to_delete = known_face_names.index(name_to_delete)
         known_face_encodings.pop(index_to_delete)
         known_face_names.pop(index_to_delete)
         print(f"{name_to_delete} has been deleted from known_faces.csv.")
@@ -166,23 +163,6 @@ def open_camera_and_mark_attendance():
     video.release()
     cv2.destroyAllWindows()
     
-    
-@app.route('/register', methods=['POST'])
-def register_person():
-    try:
-        name = request.form.get('name')
-        image_data = request.files['image']
-        
-        if not name or not image_data:
-            return jsonify({'error': 'Name and image are required.'}), 400
-
-        image_file = f"{name}.jpg"
-        image_data.save(image_file)
-        register_new_person(image_file, name)
-        return jsonify({'message': f'Registered {name}.'}), 200
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/mark-attendance', methods=['POST'])
 def mark_attendance():
@@ -208,11 +188,20 @@ def mark_attendance():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-@app.route('/register-student', methods=['POST'])
-def register_student():
+@app.route('/register-student/<name>', methods=['POST'])
+def register_student(name):
     try:
-        open_camera_and_register()
+        open_camera_and_register(name)
+        print(known_face_names)
         return jsonify({'message': 'Student registered successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/delete_person', methods=['POST'])
+def delete_person():
+    try:
+        delete_person_from_known_faces()
+        return jsonify({'message': 'Person deleted successfully.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

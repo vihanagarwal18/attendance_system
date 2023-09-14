@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+import 'dart:convert';
 //import 'package:camera/camera.dart';
 //import 'package:opencv_4/opencv_4.dart';
 //import 'dart:typed_data';
@@ -38,7 +39,8 @@ class _HomepageState extends State<Homepage> {
           ),
           TextButton(
             onPressed: (){
-              register_new_student();
+               _showNewStudentDialog();
+              //register_new_student();
             },
             child: Text("Register a new student")
           ),
@@ -59,21 +61,76 @@ class _HomepageState extends State<Homepage> {
       ),
     );
   }
-  registerStudent () async {
+
+  Future<void> _showNewStudentDialog() async {
+  String studentName = ''; // Initialize an empty string to store the student's name.
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Register a New Student'),
+        content: TextField(
+          onChanged: (value) {
+            studentName = value; // Update the student's name as the user types.
+          },
+          decoration: InputDecoration(labelText: 'Student Name'),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog.
+            },
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              registerStudent(studentName);
+              print(studentName);
+              Navigator.of(context).pop(); // Close the dialog.
+            },
+            child: Text('Register'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+  registerStudent(String studentName) async {
   try {
-    final response = await http.post(Uri.parse('http://127.0.0.1:5000/register-student'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json', // Adjust the content type if needed
-        },
+    final response = await http.post(Uri.parse('http://127.0.0.1:5000/register-student/<$studentName>'),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+      },
+      //body: jsonEncode({'name': studentName}), // Send the student name in the request body.
     );
+
     if (response.statusCode == 200) {
-      print('new student registered succesfully');
+      print('New student ($studentName) registered successfully');
     } else {
       print('Failed to register new student: ${response.statusCode}');
     }
   } catch (e) {
     print('Error: $e');
   }
+}
+
+  deletePerson() async{
+    try {
+      final response = await http.post(Uri.parse('http://127.0.0.1:5000/delete_person'),
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json', // Adjust the content type if needed
+          },
+      );
+      if (response.statusCode == 200) {
+        print('student deleted succesfully');
+      } else {
+        print('Failed to delete student: ${response.statusCode}');
+      } 
+    } catch(e){
+        print('Error: $e');
+      }
   }
 
   markAttendance() async {
@@ -83,10 +140,6 @@ class _HomepageState extends State<Homepage> {
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json', // Adjust the content type if needed
       },
-      // You can send an image as part of the request if required
-      // body: <String, String>{
-      //   'imageData': 'base64-encoded-image-data',
-      // },
     );
 
     if (response.statusCode == 200) {
@@ -113,13 +166,15 @@ class _HomepageState extends State<Homepage> {
   Widget known_faces_name_list() {
     return Container();
   }
-  Widget register_new_student() {
-    return Container(
-      child: registerStudent(),
-    );
-  }
+  // Widget register_new_student() {
+  //   return Container(
+  //     child: registerStudent(),
+  //   );
+  // }
   Widget remove_student() {
-    return Container();
+    return Container(
+      child:deletePerson(),
+    );
   }
   Widget mark_attendance() {
     return Container(
