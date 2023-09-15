@@ -33,6 +33,7 @@ dependencies:
   camera: ^0.10.5+4
   opencv_4: ^1.0.0
   csv: ^5.0.2
+  fluttertoast: ^8.2.2
 
 
   # The following adds the Cupertino Icons font to your application.

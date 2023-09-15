@@ -1,14 +1,3 @@
-# import cv2
-# video=cv2.VideoCapture(0)  ## 0 for internal webcam, 1 for external webcam
-# while(True):
-#     ret,frame=video.read() #this give 2 value one is boolean value to check whether webcam is okay or not and second is frame
-#     cv2.imshow('frame',frame)
-#     k=cv2.waitKey(1) 
-#     if k==ord('q'):  #ord is used to convert character to integer and as soon we press q it will close camera
-#         break
-# video.release()
-# cv2.destroyAllWindows()
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import face_recognition
@@ -65,24 +54,37 @@ def save_known_faces():
             encoding_str = np.array2string(encoding, separator=', ')
             csv_writer.writerow([name, encoding_str])
 
+
 def open_camera_and_register(name):
-    #name = input("Enter the name of the new person: ")
     video = cv2.VideoCapture(0)
+    
     while True:
         ret, frame = video.read()
         cv2.imshow('frame', frame)
+        
         k = cv2.waitKey(1)
         if k == ord('q'):
             break
+        elif k == ord('r'):  # Press 'r' to register the person
+            image_file = f"{name}.jpg"
+            cv2.imwrite(image_file, frame)
+            video.release()
+            cv2.destroyAllWindows()
+            register_new_person(image_file, name)
+            break
+    
     video.release()
     cv2.destroyAllWindows()
-    image_file = f"{name}.jpg"
-    cv2.imwrite(image_file, frame)
-    register_new_person(image_file, name)
+    print(known_face_names)  
+    print(2)
+    print(known_face_names)
+
 
 def register_new_person(image_file, name):
     global known_face_encodings, known_face_names
+    print(4)
     new_face = face_recognition.load_image_file(image_file)
+    print(3)
     new_face_encodings = face_recognition.face_encodings(new_face)
     if len(new_face_encodings) == 0:
         print("No face found in the provided image.")
@@ -125,16 +127,15 @@ def makeAttendanceEntry(name):
         FILE.truncate()
         FILE.writelines(updatedLines)
 
-def delete_person_from_known_faces():
+def delete_person_from_known_faces(name_to_delete):
     global known_face_encodings, known_face_names
-    name_to_delete = input("Enter the name of the person to delete: ").strip()
+    #name_to_delete = input("Enter the name of the person to delete: ").strip()
     
     if name_to_delete in known_face_names:
         index_to_delete = known_face_names.index(name_to_delete)
         known_face_encodings.pop(index_to_delete)
         known_face_names.pop(index_to_delete)
         print(f"{name_to_delete} has been deleted from known_faces.csv.")
-        # Save the updated data to the CSV file
         save_known_faces()
     else:
         print(f"{name_to_delete} not found in known_faces.csv.")
@@ -176,15 +177,16 @@ def mark_attendance():
 def register_student(name):
     try:
         open_camera_and_register(name)
+        print("123")
         print(known_face_names)
         return jsonify({'message': 'Student registered successfully.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-@app.route('/delete_person', methods=['POST'])
-def delete_person():
+@app.route('/delete_person/<name_to_delete>', methods=['POST'])
+def delete_person(name_to_delete):
     try:
-        delete_person_from_known_faces()
+        delete_person_from_known_faces(name_to_delete)
         return jsonify({'message': 'Person deleted successfully.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

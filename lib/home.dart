@@ -5,7 +5,7 @@ import 'dart:convert';
 //import 'package:camera/camera.dart';
 //import 'package:opencv_4/opencv_4.dart';
 //import 'dart:typed_data';
-import 'csv_file.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 //import 'camera_Capture.dart';
 // ignore_for_file: prefer_const_constructors
 
@@ -46,7 +46,8 @@ class _HomepageState extends State<Homepage> {
           ),
           TextButton(
             onPressed: (){
-              remove_student();
+              //remove_student();
+              _showdeleteDialog();
             },
             child: Text("Remove a student")
           ),  
@@ -60,6 +61,40 @@ class _HomepageState extends State<Homepage> {
         ],
       ),
     );
+  }
+  Future<void> _showdeleteDialog() async {
+  String person = ''; // Initialize an empty string to store the student's name.
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Delete a Student'),
+        content: TextField(
+          onChanged: (value) {
+            person = value; // Update the student's name as the user types.
+          },
+          decoration: InputDecoration(labelText: 'Student Name'),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog.
+            },
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              deletePerson(person);
+              print(person);
+              Navigator.of(context).pop(); // Close the dialog.
+              },
+            child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+      );
   }
 
   Future<void> _showNewStudentDialog() async {
@@ -88,27 +123,27 @@ class _HomepageState extends State<Homepage> {
               registerStudent(studentName);
               print(studentName);
               Navigator.of(context).pop(); // Close the dialog.
-            },
+              },
             child: Text('Register'),
-          ),
-        ],
+            ),
+          ],
+        );
+      },
       );
-    },
-  );
-}
+  }
 
   registerStudent(String studentName) async {
   try {
-    final response = await http.post(Uri.parse('http://127.0.0.1:5000/register-student/<$studentName>'),
+    final response = await http.post(Uri.parse('http://127.0.0.1:5000/register-student/$studentName'),
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
       },
       //body: jsonEncode({'name': studentName}), // Send the student name in the request body.
     );
-
     if (response.statusCode == 200) {
       print('New student ($studentName) registered successfully');
     } else {
+      print("1234");
       print('Failed to register new student: ${response.statusCode}');
     }
   } catch (e) {
@@ -116,9 +151,9 @@ class _HomepageState extends State<Homepage> {
   }
 }
 
-  deletePerson() async{
+  deletePerson(String person) async{
     try {
-      final response = await http.post(Uri.parse('http://127.0.0.1:5000/delete_person'),
+      final response = await http.post(Uri.parse('http://127.0.0.1:5000/delete_person/$person'),
           headers: {
             HttpHeaders.contentTypeHeader: 'application/json', // Adjust the content type if needed
           },
@@ -157,8 +192,7 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         title: Text("Attendance List"),
       ),
-      // child: Text("Attendance List"),
-      body: MyCSVWidget(),
+      //body: MyCSVWidget(),
       //attendance_list.csv print karni hain edhar toh usse seedha parse karna and prine karna
     );
   }
@@ -171,11 +205,11 @@ class _HomepageState extends State<Homepage> {
   //     child: registerStudent(),
   //   );
   // }
-  Widget remove_student() {
-    return Container(
-      child:deletePerson(),
-    );
-  }
+  // Widget remove_student() {
+  //   return Container(
+  //     child:deletePerson(),
+  //   );
+  // }
   Widget mark_attendance() {
     return Container(
       child: markAttendance(),
