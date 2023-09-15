@@ -29,6 +29,9 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       attendance_data= _listdata1;
     });
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => view_attendance_list()),
+    );
   }
 
   void _loadCSV_known() async{
@@ -37,6 +40,9 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       known_face_data= _listdata2;
     });
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => known_faces_name_list()),
+    );
   }
 
 
@@ -51,6 +57,7 @@ class _HomepageState extends State<Homepage> {
           TextButton(
             onPressed: () {
               _loadCSV_attendance();
+              print(5);
               view_attendance_list();
             },
             child: Text("Attendance List")
@@ -59,6 +66,7 @@ class _HomepageState extends State<Homepage> {
             onPressed: (){
               _loadCSV_known();
               known_faces_name_list();
+              print(6);
             },
             child: Text("All Students List")
           ),
@@ -222,7 +230,7 @@ class _HomepageState extends State<Homepage> {
         itemBuilder: (_,index){
           return Card(
             margin: const EdgeInsets.all(3),
-            color: Colors.red,
+            color: (index==0)?Colors.blue:Colors.red,
             child: ListTile(
               leading: Text(attendance_data[index][0].toString()),
               title: Text(attendance_data[index][1].toString()),
@@ -239,20 +247,20 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         title: Text("Known faces List"),
       ),
-      // body: ListView.builder(
-      //     itemCount: known_face_data.length,
-      //     itemBuilder: (_,index){
-      //       return Card(
-      //         margin: const EdgeInsets.all(3),
-      //         color: Colors.red,
-      //         child: ListTile(
-      //           leading: Text(known_face_data[index][0].toString()),
-      //           title: Text(known_face_data[index][1].toString()),
-      //           trailing: Text(known_face_data[index][2].toString()),
-      //         ),
-      //       );
-      //     }
-      // ),
+      body: ListView.builder(
+          itemCount: known_face_data.length,
+          itemBuilder: (_,index){
+            return Card(
+              margin: const EdgeInsets.all(3),
+              color: Colors.red,
+              child: ListTile(
+                leading: Text(known_face_data[index][0].toString()),
+                //title: Text(known_face_data[index][1].toString()),
+                //trailing: Text(known_face_data[index][2].toString()),
+              ),
+            );
+          }
+      ),
     );
   }
   Widget mark_attendance() {

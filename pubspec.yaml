@@ -66,6 +66,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/attendance_list.csv
+    - assets/known_faces.csv
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
