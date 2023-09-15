@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+import 'package:csv/csv.dart';
 import 'dart:convert';
 //import 'package:camera/camera.dart';
 //import 'package:opencv_4/opencv_4.dart';
 //import 'dart:typed_data';
-import 'package:fluttertoast/fluttertoast.dart';
+//import 'package:fluttertoast/fluttertoast.dart';
 //import 'camera_Capture.dart';
 // ignore_for_file: prefer_const_constructors
 
@@ -17,6 +19,27 @@ class Homepage extends StatefulWidget {
 
 
 class _HomepageState extends State<Homepage> {
+
+  List<List<dynamic>> attendance_data=[];
+  List<List<dynamic>> known_face_data=[];
+
+  void _loadCSV_attendance() async{
+    final _rawdata1=await rootBundle.loadString("assets/attendance_list.csv");
+    List<List<dynamic>> _listdata1=const CsvToListConverter().convert(_rawdata1);
+    setState(() {
+      attendance_data= _listdata1;
+    });
+  }
+
+  void _loadCSV_known() async{
+    final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
+    List<List<dynamic>> _listdata2=const CsvToListConverter().convert(_rawdata2);
+    setState(() {
+      known_face_data= _listdata2;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,12 +50,14 @@ class _HomepageState extends State<Homepage> {
         children: [
           TextButton(
             onPressed: () {
+              _loadCSV_attendance();
               view_attendance_list();
             },
             child: Text("Attendance List")
             ),
           TextButton(
             onPressed: (){
+              _loadCSV_known();
               known_faces_name_list();
             },
             child: Text("All Students List")
@@ -187,29 +212,49 @@ class _HomepageState extends State<Homepage> {
   }
 }
 
-  Widget view_attendance_list() {
+  Widget view_attendance_list(){
     return Scaffold(
       appBar: AppBar(
-        title: Text("Attendance List"),
+        title: Text("Attendance  List"),
       ),
-      //body: MyCSVWidget(),
-      //attendance_list.csv print karni hain edhar toh usse seedha parse karna and prine karna
+      body: ListView.builder(
+        itemCount: attendance_data.length,
+        itemBuilder: (_,index){
+          return Card(
+            margin: const EdgeInsets.all(3),
+            color: Colors.red,
+            child: ListTile(
+              leading: Text(attendance_data[index][0].toString()),
+              title: Text(attendance_data[index][1].toString()),
+              trailing: Text(attendance_data[index][2].toString()),
+            ),
+          );
+        }
+      ),
     );
   }
 
   Widget known_faces_name_list() {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Known faces List"),
+      ),
+      // body: ListView.builder(
+      //     itemCount: known_face_data.length,
+      //     itemBuilder: (_,index){
+      //       return Card(
+      //         margin: const EdgeInsets.all(3),
+      //         color: Colors.red,
+      //         child: ListTile(
+      //           leading: Text(known_face_data[index][0].toString()),
+      //           title: Text(known_face_data[index][1].toString()),
+      //           trailing: Text(known_face_data[index][2].toString()),
+      //         ),
+      //       );
+      //     }
+      // ),
+    );
   }
-  // Widget register_new_student() {
-  //   return Container(
-  //     child: registerStudent(),
-  //   );
-  // }
-  // Widget remove_student() {
-  //   return Container(
-  //     child:deletePerson(),
-  //   );
-  // }
   Widget mark_attendance() {
     return Container(
       child: markAttendance(),

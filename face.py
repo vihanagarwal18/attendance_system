@@ -35,7 +35,7 @@ known_face_names.append("Jeff Bezos")
 def load_known_faces():
     global known_face_encodings, known_face_names
     try:
-        with open('known_faces.csv', 'r') as file:
+        with open('assets/known_faces.csv', 'r') as file:
             csv_reader = csv.reader(file)
             for row in csv_reader:
                 name, encoding_str = row
@@ -48,7 +48,7 @@ def load_known_faces():
         
 
 def save_known_faces():
-    with open('known_faces.csv', 'w', newline='') as file:
+    with open('assets/known_faces.csv', 'w', newline='') as file:
         csv_writer = csv.writer(file)
         for name, encoding in zip(known_face_names, known_face_encodings):
             encoding_str = np.array2string(encoding, separator=', ')
@@ -75,9 +75,8 @@ def open_camera_and_register(name):
     
     video.release()
     cv2.destroyAllWindows()
+    save_known_faces()
     print(known_face_names)  
-    print(2)
-    print(known_face_names)
 
 
 def register_new_person(image_file, name):
@@ -107,7 +106,7 @@ def makeAttendanceEntry(name):
     now = datetime.now()
     dtString = now.strftime('%d/%b/%Y, %H:%M:%S')
     
-    with open('attendance_list.csv', 'r+') as FILE:
+    with open('assets/attendance_list.csv', 'r+') as FILE:
         allLines = FILE.readlines()
         updatedLines = []
         found = False
