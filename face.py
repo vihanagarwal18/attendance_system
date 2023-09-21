@@ -129,6 +129,7 @@ def makeAttendanceEntry(name):
 def delete_person_from_known_faces(name_to_delete):
     global known_face_encodings, known_face_names
     #name_to_delete = input("Enter the name of the person to delete: ").strip()
+    name_to_delete=name_to_delete.strip()
     
     if name_to_delete in known_face_names:
         index_to_delete = known_face_names.index(name_to_delete)
@@ -186,6 +187,7 @@ def register_student(name):
 def delete_person(name_to_delete):
     try:
         delete_person_from_known_faces(name_to_delete)
+        print(known_face_names)
         return jsonify({'message': 'Person deleted successfully.'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

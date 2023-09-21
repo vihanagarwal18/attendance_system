@@ -34,9 +34,11 @@ class _HomepageState extends State<Homepage> {
   }
 
   void _loadCSV_known() async{
-    final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
-    List<List<dynamic>> _listdata2=CsvToListConverter().convert(_rawdata2);
-    setState(() {
+    // final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
+    // List<List<dynamic>> _listdata2=CsvToListConverter().convert(_rawdata2);
+    setState(() async {
+      final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
+      List<List<dynamic>> _listdata2=CsvToListConverter().convert(_rawdata2);
       known_face_data= _listdata2;
     });
     // Navigator.of(context).push(
@@ -51,53 +53,154 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         title: Text("Homepage"),
       ),
-      body: Column(
-        children: [
-          TextButton(
-            onPressed: () {
-              _loadCSV_attendance();
-              print(5);
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => view_attendance_list()),
-              );
-              //view_attendance_list();
-            },
-            child: Text("Attendance List")
+      body: Center(
+        child: Column(
+          children: [
+            Padding(padding: EdgeInsets.all(10.0)),
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+                //foregroundColor: Colors.green,
+                backgroundColor: Colors.white,
+                //disabledForegroundColor: Colors.grey,
+                shadowColor: Colors.yellow,
+                elevation: 15.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              onPressed: () {
+                _loadCSV_attendance();
+                print(5);
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => view_attendance_list()),
+                );
+                //view_attendance_list();
+              },
+              child: Text("Attendance List",
+                  style: TextStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                  letterSpacing: 2.0,
+                  fontFamily: 'OpenSans',
+                  ),
+                ),
+              ),
+            Padding(padding: EdgeInsets.all(15.0)),
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+                //foregroundColor: Colors.green,
+                backgroundColor: Colors.white,
+                //disabledForegroundColor: Colors.grey,
+                shadowColor: Colors.yellow,
+                elevation: 15.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              onPressed: (){
+                _loadCSV_known();
+                // Navigator.of(context).push(
+                //   MaterialPageRoute(builder: (context) => known_faces_name_list()),
+                // );
+                //known_faces_name_list();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => known_faces_name_list()),
+                );
+                print(6);
+              },
+              child: Text("All Students List",
+              style: TextStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                  letterSpacing: 2.0,
+                  fontFamily: 'OpenSans',
+                  ),
+              )
             ),
-          TextButton(
-            onPressed: (){
-              _loadCSV_known();
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(builder: (context) => known_faces_name_list()),
-              // );
-              //known_faces_name_list();
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => known_faces_name_list()),
-              );
-              print(6);
-            },
-            child: Text("All Students List")
-          ),
-          TextButton(
-            onPressed: (){
-               _showNewStudentDialog();
-            },
-            child: Text("Register a new student")
-          ),
-          TextButton(
-            onPressed: (){
-              _showdeleteDialog();
-            },
-            child: Text("Remove a student")
-          ),  
-          TextButton(
-            //onPressed: markAttendance,
-            onPressed: (){
-              mark_attendance();
-            },
-            child: Text("Mark Attendance")
-          ),
-        ],
+            Padding(padding: EdgeInsets.all(15.0)),
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+                //foregroundColor: Colors.green,
+                backgroundColor: Colors.white,
+                //disabledForegroundColor: Colors.grey,
+                shadowColor: Colors.yellow,
+                elevation: 15.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              onPressed: (){
+                 _showNewStudentDialog();
+              },
+              child: Text("Register a new student",
+              style: TextStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                  letterSpacing: 2.0,
+                  fontFamily: 'OpenSans',
+                  ),
+              )
+            ),
+            Padding(padding: EdgeInsets.all(15.0)),
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+                //foregroundColor: Colors.green,
+                backgroundColor: Colors.white,
+                //disabledForegroundColor: Colors.grey,
+                shadowColor: Colors.yellow,
+                elevation: 15.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              onPressed: (){
+                _showdeleteDialog();
+              },
+              child: Text("Remove a student",
+              style: TextStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                  letterSpacing: 2.0,
+                  fontFamily: 'OpenSans',
+                  ),
+              )
+            ),
+            Padding(padding: EdgeInsets.all(15.0)),  
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+                //foregroundColor: Colors.green,
+                backgroundColor: Colors.white,
+                //disabledForegroundColor: Colors.grey,
+                shadowColor: Colors.yellow,
+                elevation: 15.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              onPressed: (){
+                mark_attendance();
+              },
+              child: Text("Mark Attendance",
+              style: TextStyle(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                  letterSpacing: 2.0,
+                  fontFamily: 'OpenSans',
+                  ),
+              )
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -182,9 +285,9 @@ class _HomepageState extends State<Homepage> {
       },
       //body: jsonEncode({'name': studentName}), // Send the student name in the request body.
     );
+    //_loadCSV_known();
     if (response.statusCode == 200) {
       print('New student ($studentName) registered successfully');
-      _loadCSV_known();
     } else {
       print("1234");
       print('Failed to register new student: ${response.statusCode}');
@@ -202,12 +305,13 @@ class _HomepageState extends State<Homepage> {
             HttpHeaders.contentTypeHeader: 'application/json', // Adjust the content type if needed
           },
       );
+      //_loadCSV_known();
       if (response.statusCode == 200) {
         print('student deleted succesfully');
-        _loadCSV_known();
+       // _loadCSV_known();
       } else {
         print('Failed to delete student: ${response.statusCode}');
-        _loadCSV_known();
+        //_loadCSV_known();
       } 
     } catch(e){
         print('Error: $e');
@@ -222,6 +326,7 @@ class _HomepageState extends State<Homepage> {
         HttpHeaders.contentTypeHeader: 'application/json', // Adjust the content type if needed
       },
     );
+    //_loadCSV_attendance();
 
     if (response.statusCode == 200) {
       print('Attendance marked successfully');
