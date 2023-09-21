@@ -8,7 +8,6 @@ import 'dart:convert';
 import 'package:opencv_4/opencv_4.dart';
 //import 'dart:typed_data';
 //import 'package:fluttertoast/fluttertoast.dart';
-//import 'camera_Capture.dart';
 // ignore_for_file: prefer_const_constructors
 
 class Homepage extends StatefulWidget {
@@ -29,20 +28,20 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       attendance_data= _listdata1;
     });
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => view_attendance_list()),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(builder: (context) => view_attendance_list()),
+    // );
   }
 
   void _loadCSV_known() async{
     final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
-    List<List<dynamic>> _listdata2=const CsvToListConverter().convert(_rawdata2);
+    List<List<dynamic>> _listdata2=CsvToListConverter().convert(_rawdata2);
     setState(() {
       known_face_data= _listdata2;
     });
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => known_faces_name_list()),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(builder: (context) => known_faces_name_list()),
+    // );
   }
 
 
@@ -58,14 +57,23 @@ class _HomepageState extends State<Homepage> {
             onPressed: () {
               _loadCSV_attendance();
               print(5);
-              view_attendance_list();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => view_attendance_list()),
+              );
+              //view_attendance_list();
             },
             child: Text("Attendance List")
             ),
           TextButton(
             onPressed: (){
               _loadCSV_known();
-              known_faces_name_list();
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(builder: (context) => known_faces_name_list()),
+              // );
+              //known_faces_name_list();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => known_faces_name_list()),
+              );
               print(6);
             },
             child: Text("All Students List")
@@ -73,13 +81,11 @@ class _HomepageState extends State<Homepage> {
           TextButton(
             onPressed: (){
                _showNewStudentDialog();
-              //register_new_student();
             },
             child: Text("Register a new student")
           ),
           TextButton(
             onPressed: (){
-              //remove_student();
               _showdeleteDialog();
             },
             child: Text("Remove a student")
@@ -112,13 +118,15 @@ class _HomepageState extends State<Homepage> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog.
+              Navigator.of(context).pop();// Close the dialog.
+              //_loadCSV_known();
             },
             child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
               deletePerson(person);
+              _loadCSV_known();
               print(person);
               Navigator.of(context).pop(); // Close the dialog.
               },
@@ -156,6 +164,7 @@ class _HomepageState extends State<Homepage> {
               registerStudent(studentName);
               print(studentName);
               Navigator.of(context).pop(); // Close the dialog.
+              //_loadCSV_known();
               },
             child: Text('Register'),
             ),
@@ -175,9 +184,11 @@ class _HomepageState extends State<Homepage> {
     );
     if (response.statusCode == 200) {
       print('New student ($studentName) registered successfully');
+      _loadCSV_known();
     } else {
       print("1234");
       print('Failed to register new student: ${response.statusCode}');
+      _loadCSV_known();
     }
   } catch (e) {
     print('Error: $e');
@@ -193,8 +204,10 @@ class _HomepageState extends State<Homepage> {
       );
       if (response.statusCode == 200) {
         print('student deleted succesfully');
+        _loadCSV_known();
       } else {
         print('Failed to delete student: ${response.statusCode}');
+        _loadCSV_known();
       } 
     } catch(e){
         print('Error: $e');
@@ -243,6 +256,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget known_faces_name_list() {
+    //_loadCSV_known();
     return Scaffold(
       appBar: AppBar(
         title: Text("Known faces List"),
@@ -255,8 +269,6 @@ class _HomepageState extends State<Homepage> {
               color: Colors.red,
               child: ListTile(
                 leading: Text(known_face_data[index][0].toString()),
-                //title: Text(known_face_data[index][1].toString()),
-                //trailing: Text(known_face_data[index][2].toString()),
               ),
             );
           }
