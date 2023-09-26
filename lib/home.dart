@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'dart:convert';
 //import 'package:camera/camera.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:opencv_4/opencv_4.dart';
 //import 'dart:typed_data';
 //import 'package:fluttertoast/fluttertoast.dart';
@@ -33,14 +34,17 @@ class _HomepageState extends State<Homepage> {
     // );
   }
 
-  void _loadCSV_known() async{
-    // final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
-    // List<List<dynamic>> _listdata2=CsvToListConverter().convert(_rawdata2);
-    setState(() async {
-      final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
-      List<List<dynamic>> _listdata2=CsvToListConverter().convert(_rawdata2);
-      known_face_data= _listdata2;
-    });
+  Future <void> _loadCSV_known() async{
+     final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
+     List<List<dynamic>> _listdata2=CsvToListConverter().convert(_rawdata2);
+     known_face_data=_listdata2;
+    // setState(() async {
+    //   //final _rawdata2=await rootBundle.loadString("assets/known_faces.csv");
+    //   //List<List<dynamic>> _listdata2=CsvToListConverter().convert(_rawdata2);
+    //   known_face_data= _listdata2;
+    //   print(_listdata2);
+    //   //print(known_face_data);
+    // });
     // Navigator.of(context).push(
     //   MaterialPageRoute(builder: (context) => known_faces_name_list()),
     // );
@@ -100,11 +104,10 @@ class _HomepageState extends State<Homepage> {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
               ),
-              onPressed: (){
-                _loadCSV_known();
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(builder: (context) => known_faces_name_list()),
-                // );
+              onPressed: () async{
+                print("Button pressed");
+                await _loadCSV_known();
+                print("Button pressed successfully");
                 //known_faces_name_list();
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => known_faces_name_list()),
@@ -135,7 +138,9 @@ class _HomepageState extends State<Homepage> {
                 ),
               ),
               onPressed: (){
+                 //_loadCSV_known();
                  _showNewStudentDialog();
+                 Restart.restartApp();
               },
               child: Text("Register a new student",
               style: TextStyle(
@@ -162,6 +167,7 @@ class _HomepageState extends State<Homepage> {
               ),
               onPressed: (){
                 _showdeleteDialog();
+                Restart.restartApp();
               },
               child: Text("Remove a student",
               style: TextStyle(
@@ -361,7 +367,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget known_faces_name_list() {
-    //_loadCSV_known();
+    _loadCSV_known();
     return Scaffold(
       appBar: AppBar(
         title: Text("Known faces List"),
